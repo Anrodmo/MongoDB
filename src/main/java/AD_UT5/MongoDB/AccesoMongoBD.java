@@ -6,6 +6,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
 import com.mongodb.ConnectionString;
+import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import static com.mongodb.client.model.Filters.eq;
 
@@ -65,9 +66,9 @@ public class AccesoMongoBD {
             }
        	    // ahora que he construido el documento lo inserto en la colección, con esto se actualiza en la BBDD 	       	
         	coleccion.insertOne(documento);       	      	       	       	
-        }catch( Exception ex) {  // por si hubiera alguna excepción, loas clases no la piden
-        	ex.printStackTrace();
-        }
+        }catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }
 		
 	}
 	
@@ -91,7 +92,9 @@ public class AccesoMongoBD {
         		cursor.close();  // lo cierro porque no abrí el cursor con try con recursos.
         	}
 		
-		}
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }
 	}
 	
 	
@@ -114,7 +117,9 @@ public class AccesoMongoBD {
         	}else {
         		System.out.println("No hay registros con clave: "+clave+", valor: "+valor);
         	}        	
-		}		
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }		
 	}
 	
 	
@@ -147,11 +152,37 @@ public class AccesoMongoBD {
         	}else {
         		System.out.println("No hay registros con clave: "+clave+", valor: "+valor);
         	}        	
-		}       // y lo devuelvo
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }       
+		// y lo devuelvo
 		return retorno;
 	}
 	
-	
+	public void insertarRegistro(ObjDatosMongoDB objeto) {
+	    // Creo un proveedor de codec, parecido a una factory builder
+	    PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
+	    // De ese proveedor de codec creo un registro del codec, parecido a una factory
+	    CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+	    
+	    // La conexión se crea normal
+	    try (MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))) {
+	        // Obtengo la base de datos utilizando el codec 
+	        MongoDatabase dataBase = mongoClient.getDatabase(baseDatos).withCodecRegistry(pojoCodecRegistry);
+	        
+	        // Obtengo la colección indicando el tipo de objeto sobre el que se van a volcar los datos
+	        MongoCollection<ObjDatosMongoDB> col = dataBase.getCollection(this.coleccion, ObjDatosMongoDB.class);
+	        
+	        // Inserto el objeto en la colección , se actualiza sin mas en la BBDD
+	        col.insertOne(objeto);
+	        
+	        // Muestro un mensaje indicando que la inserción fue exitosa
+	        System.out.println("Registro insertado correctamente.");
+	        
+	    } catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }
+	}
 	
 	
 	
