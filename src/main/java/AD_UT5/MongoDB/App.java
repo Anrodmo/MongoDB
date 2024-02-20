@@ -25,19 +25,19 @@ public class App
     	
     	conexionMongoDB.mostrarRegistros();
     	
-//    	System.out.println("\n========== Inserto 1 registro ================\n");
-//    	
-//    	
-//    	Map<String, String> miMapa = new HashMap<>();
-//        miMapa.put("Nombre", "Angel");
-//        miMapa.put("edad", "40");
-//        miMapa.put("ciudad", "Valencia");
+    	System.out.println("\n========== Inserto 1 registro ================\n");
+   	
+    	
+    	Map<String, String> miMapa = new HashMap<>();
+        	miMapa.put("Nombre", "Angel");
+        	miMapa.put("edad", "40");
+        	miMapa.put("ciudad", "Valencia");
         
-//        conexionMongoDB.insertarDatos(miMapa);
+        conexionMongoDB.insertarDatos(miMapa);
     	
     	
     	System.out.println("\n========== Muestro registro nombre:Angel ================\n");
-    	conexionMongoDB.mostrarRegistro("Nombre","Angel");
+    	//conexionMongoDB.mostrarRegistro("Nombre","Angel");
         
         System.out.println("\n========== Muestro los registros ================\n");
         conexionMongoDB.mostrarRegistros();
