@@ -136,7 +136,7 @@ public class AccesoMongoBD {
 		PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
 		// de ese proveedor de codec creo un registro del codec, parecido a una factory
         CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
-        // incializo el objeto que voy a devolver.
+        // inicializo el objeto que voy a devolver.
 		ObjDatosMongoDB retorno =null;
 		// la conexión se crea normal
 		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){
@@ -144,11 +144,12 @@ public class AccesoMongoBD {
         	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos).withCodecRegistry(pojoCodecRegistry);;
         	 // la colección se obtiene indicando el tipo de objeto sobre el que se van a volcar los datos.
         	MongoCollection<ObjDatosMongoDB> col = dataBase.getCollection(this.coleccion,ObjDatosMongoDB.class);
-        	 // finalmente saco el obejto que cumpla los requisitos de forma similar al mñetodo anterior.
+        	 // finalmente saco el objeto que cumpla los requisitos de forma similar al mñetodo anterior.
         	ObjDatosMongoDB documento = col.find(eq(clave,valor)).first();
         	
         	if(documento != null) { // lo muestro por pantalla si existe
         		System.out.println(documento.toString());
+        		retorno = documento;
         	}else {
         		System.out.println("No hay registros con clave: "+clave+", valor: "+valor);
         	}        	

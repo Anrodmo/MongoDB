@@ -7,7 +7,7 @@ package AD_UT5.MongoDB;
  */
 public class ObjDatosMongoDB {
 	private String nombre;
-	private int edad;
+	private String edad;
 	private String ciudad;
 	
 	
@@ -17,10 +17,10 @@ public class ObjDatosMongoDB {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public int getEdad() {
+	public String getEdad() {
 		return edad;
 	}
-	public void setEdad(int edad) {
+	public void setEdad(String edad) {
 		this.edad = edad;
 	}
 	public String getCiudad() {
@@ -30,6 +30,8 @@ public class ObjDatosMongoDB {
 		this.ciudad = ciudad;
 	}
 	
-	
+	public String toString() {
+		return "Nombre: "+this.nombre+", edad: "+this.edad+", ciudad: "+this.ciudad;
+	}
 
 }

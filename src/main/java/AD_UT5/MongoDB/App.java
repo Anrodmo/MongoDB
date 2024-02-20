@@ -1,13 +1,11 @@
 package AD_UT5.MongoDB;
 
 
-import com.mongodb.ConnectionString;
-import com.mongodb.client.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bson.Document;
+
 
 
 /**
@@ -29,51 +27,39 @@ public class App
    	
     	
     	Map<String, String> miMapa = new HashMap<>();
-        	miMapa.put("Nombre", "Angel");
+        	miMapa.put("Nombre", "Maria");
         	miMapa.put("edad", "40");
-        	miMapa.put("ciudad", "Valencia");
+        	miMapa.put("ciudad", "Albacete");
         
         conexionMongoDB.insertarDatos(miMapa);
     	
     	
     	System.out.println("\n========== Muestro registro nombre:Angel ================\n");
-    	//conexionMongoDB.mostrarRegistro("Nombre","Angel");
+    	conexionMongoDB.mostrarRegistro("Nombre","Angel");
         
         System.out.println("\n========== Muestro los registros ================\n");
         conexionMongoDB.mostrarRegistros();
     	
-//        String cadenaconexion= "mongodb+srv://anrodmo:VLdFNW9vIO1XLSdM@cluster0.tlj1tk0.mongodb.net/?retryWrites=true&w=majority";
-//
-//        try(MongoClient mongoClient = MongoClients.create(new ConnectionString(cadenaconexion))){
-//        	
-//        	MongoDatabase dataBase = mongoClient.getDatabase("mi_base_de_datos");
-//        	
-//        	MongoCollection<Document> coleccion = dataBase.getCollection("mi_coleccion");
-//        	
-//        	Document documento = new Document("nombre","Andrés")
-//        			.append("edad", 25)
-//        			.append("procincia","Albacete")
-//        			.append("ciudad", "Albacete");
-//        	
-//        	coleccion.insertOne(documento);
-//        	
-//        	MongoCursor<Document> cursor = coleccion.find().iterator();
-//        	
-//        	try {
-//        		while (cursor.hasNext()) {
-//        			System.out.println(cursor.next().toJson());
-//        			
-//        		}
-//        	}finally {
-//        		cursor.close();
-//        	}
-//        	
-//        	
-//        }catch( Exception ex) {
-//        	ex.printStackTrace();
-//        }
+        System.out.println("\n========== Creo objeto y añado a partir del objeto ======\n");
+        ObjDatosMongoDB obj = new ObjDatosMongoDB();
+        obj.setCiudad("Madrid");
+        obj.setEdad("25");
+        obj.setNombre("Maria José");
+        
+        conexionMongoDB.insertarRegistro(obj);
+        
+        System.out.println("Objeto creado => "+obj.toString());
+        
+        System.out.println("\n========== Muestro los registros ================\n");
+        conexionMongoDB.mostrarRegistros();
+        
+        System.out.println("\n========== Muestro registro  y obtebgo objeto nombre:Angel ================\n");
+        
+        obj = conexionMongoDB.encontrarRegistro("Nombre","Angel");
+        System.out.println("Objeto encontrado => "+obj.toString());
         
         
-    }  
+        
+    } 
         
 }
