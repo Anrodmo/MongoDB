@@ -1,5 +1,10 @@
 package AD_UT5.MongoDB;
 
+/**
+ * Objeto para usar como reflejo de los registros de la colección de MongoDB, solo hace falta que
+ * los atributos tengan el mismo nombre que las claves y sean el mismo tipo de dato.
+ * Solo hay que añadir setter y getter de todos.
+ */
 public class ObjDatosMongoDB {
 	private String nombre;
 	private int edad;
