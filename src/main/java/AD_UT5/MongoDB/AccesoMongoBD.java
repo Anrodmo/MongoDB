@@ -1,5 +1,7 @@
 package AD_UT5.MongoDB;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -18,8 +20,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
-
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.MongoClient;
 //import com.mongodb.MongoClient;
 
@@ -53,7 +54,7 @@ public class AccesoMongoBD {
 		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){
         	  // creo el objeto de la base de datos en la que trabajo
         	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos);
-        	  // creo el objeto de la coleccion sobre la que trabajo
+        	  // creo el objeto de la colección sobre la que trabajo
         	MongoCollection<Document> coleccion = dataBase.getCollection(this.coleccion);
         	
         	// creo un documento que será cada uno de los elementos de la colección
@@ -71,6 +72,37 @@ public class AccesoMongoBD {
 	    }
 		
 	}
+	
+	/**
+	 * Método que crea un registro en la colección a partir de un Map<String,Object> con clave,valor
+	 * Inserta todos los datos como un solo elemento de la colección. 
+	 * @param datos
+	 */
+	public void insertarDatosCualesquiera(Map<String,Object> datos) {
+		   
+		 // creo la conexión con el string de conexión (try con recursos para que se cierre solo)
+		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){
+        	  // creo el objeto de la base de datos en la que trabajo
+        	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos);
+        	  // creo el objeto de la coleccion sobre la que trabajo
+        	MongoCollection<Document> coleccion = dataBase.getCollection(this.coleccion);
+        	
+        	// creo un documento que será cada uno de los elementos de la colección
+        	Document documento = new Document();
+        	
+        	// itero por mi map para anexar los datos del map, para cada clave obtengo valor
+        	for (String clave : datos.keySet()) {             
+                Object valor = datos.get(clave);
+                documento.append(clave, valor);
+            }
+       	    // ahora que he construido el documento lo inserto en la colección, con esto se actualiza en la BBDD 	       	
+        	coleccion.insertOne(documento);       	      	       	       	
+        }catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }
+		
+	}
+	
 	
 	
 	/**
@@ -103,7 +135,7 @@ public class AccesoMongoBD {
 	 * @param clave
 	 * @param valor
 	 */
-	public void mostrarRegistro(String clave, String valor) {
+	public void mostrarRegistro(String clave, Object valor) {
 		
 		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){        	
         	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos);       	
@@ -115,7 +147,82 @@ public class AccesoMongoBD {
         	if(documento != null) {  // su existe lo imprimo y si no pues doy un mensaje de error.
         		System.out.println(documento.toJson());
         	}else {
-        		System.out.println("No hay registros con clave: "+clave+", valor: "+valor);
+        		System.out.println("No hay registros con clave: "+clave+", valor: "+valor.toString());
+        	}        	
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }		
+	}
+	
+	/**
+	 * Método que busca todos los registros que tengan la clave y el valor indicados por parámetro
+	 * @param clave
+	 * @param valor
+	 */
+	public void mostrarTodosRegistros(String clave, Object valor) {
+		
+		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){        	
+        	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos);       	
+        	MongoCollection<Document> col = dataBase.getCollection(this.coleccion);
+        	
+        	// Busca todos los documentos con la clave y valor proporcionados
+            FindIterable<Document> documentos = col.find(eq(clave, valor));
+
+            // Itera sobre los documentos e imprime cada uno
+            for (Document documento : documentos) {
+                System.out.println(documento.toJson());
+            }
+            // Para informas si no se encontró ninguno
+            if (documentos.first() == null) {
+                System.out.println("No hay registros con clave: " + clave + ", valor: " + valor.toString());
+            }    	
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }		
+	}
+	
+	/**
+	 * Método que elimina el primer registro que tenga la clave y el valor indicados por parámetro
+	 * @param clave
+	 * @param valor
+	 */
+	public void eliminarRegistro(String clave, Object valor) {
+		
+		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){        	
+        	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos);       	
+        	MongoCollection<Document> col = dataBase.getCollection(this.coleccion);
+        	
+        	// Elimina el primer documento con la clave y valor facilitador por parámetro
+            DeleteResult resultadoBorrar = col.deleteOne(eq(clave, valor));
+        	
+        	if(resultadoBorrar.getDeletedCount() >0) {  // su existe lo imprimo y si no pues doy un mensaje de error.
+        		System.out.println("Registro eliminado con éxito => clave: "+clave+", valor: "+valor.toString());
+        	}else {
+        		System.out.println("No hay registros con clave: "+clave+", valor: "+valor.toString());
+        	}        	
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }		
+	}
+	
+	/**
+	 * Método que elimina todos los registros que tengan la clave y el valor indicados por parámetro
+	 * @param clave
+	 * @param valor
+	 */
+	public void eliminarTodosRegistros(String clave, Object valor) {
+		
+		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){        	
+        	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos);       	
+        	MongoCollection<Document> col = dataBase.getCollection(this.coleccion);
+        	
+        	// Elimina el primer documento con la clave y valor facilitador por parámetro
+            DeleteResult resultadoBorrar = col.deleteMany(eq(clave, valor));
+        	
+        	if(resultadoBorrar.getDeletedCount() >0) {  // su existe lo imprimo y si no pues doy un mensaje de error.
+        		System.out.println("Registro eliminado con éxito => clave: "+clave+", valor: "+valor.toString());
+        	}else {
+        		System.out.println("No hay registros con clave: "+clave+", valor: "+valor.toString());
         	}        	
 		}catch (MongoException e) {    // la excepción de mongoDB     
 	        e.printStackTrace();
@@ -128,7 +235,7 @@ public class AccesoMongoBD {
 	 * con los datos
 	 * @param clave
 	 * @param valor
-	 * @return   Objeto con los datos del registro
+	 * @return  Objeto con los datos del registro
 	 */
 	public ObjDatosMongoDB encontrarRegistro(String clave, String valor) {
 		
@@ -158,6 +265,48 @@ public class AccesoMongoBD {
 	    }       
 		// y lo devuelvo
 		return retorno;
+	}
+	
+	
+	/**
+	 * Método que busca todos los registro que tenga la clave y el valor facilitado por parámetro y devuelve
+	 * una lista de objetos con ellos
+	 * @param clave
+	 * @param valor
+	 * @return  Objeto con los datos del registro
+	 */
+	public List<ObjDatosMongoDB> encontrarTodosRegistros(String clave, String valor) {
+		List<ObjDatosMongoDB> listaRegistros = new ArrayList<>();
+		// tengo que crear un proveedor de codec, pareciddo a una factory builder
+		PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
+		// de ese proveedor de codec creo un registro del codec, parecido a una factory
+        CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+        
+		// la conexión se crea normal
+		try(MongoClient mongoClient = MongoClients.create(new ConnectionString(ConString.getConString()))){
+			 // pero la BBDD se obtiene utilizando el codec 
+        	MongoDatabase dataBase = mongoClient.getDatabase(baseDatos).withCodecRegistry(pojoCodecRegistry);;
+        	 // la colección se obtiene indicando el tipo de objeto sobre el que se van a volcar los datos.
+        	MongoCollection<ObjDatosMongoDB> col = dataBase.getCollection(this.coleccion,ObjDatosMongoDB.class);
+        	 // finalmente saco el objeto que cumpla los requisitos de forma similar al mñetodo anterior.
+        	// Obtengo un iterable con todos los documentos con clave:valor
+            FindIterable<ObjDatosMongoDB> documentos = col.find(eq(clave, valor));
+
+            // Itero sobre los documentos y los añado a la lista
+            for (ObjDatosMongoDB documento : documentos) {
+                System.out.println(documento.toString());
+                listaRegistros.add(documento);
+            }
+
+            // Verifico si se encontraron registros
+            if (listaRegistros.isEmpty()) {
+                System.out.println("No hay registros con clave: " + clave + ", valor: " + valor);
+            }       	
+		}catch (MongoException e) {    // la excepción de mongoDB     
+	        e.printStackTrace();
+	    }       
+		// y lo devuelvo
+		return listaRegistros;
 	}
 	
 	public void insertarRegistro(ObjDatosMongoDB objeto) {
