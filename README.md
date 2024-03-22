@@ -5,9 +5,9 @@
 </ul>
 
 ```xml
-        <dependency>
-        		<groupId>org.mongodb</groupId>
-        		<artifactId>mongodb-driver-sync</artifactId>
-        		<version>4.11.1</version>
-	      </dependency>
+	<dependency>
+		<groupId>org.mongodb</groupId>
+		<artifactId>mongodb-driver-sync</artifactId>
+		<version>4.11.1</version>
+	</dependency>
        
